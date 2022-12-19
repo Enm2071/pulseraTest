@@ -7,6 +7,7 @@ interface IProcedure {
   procedure: string;
   difference: string;
   claim: string;
+  hasChanged?: boolean;
 }
 
 interface IProcedureProps {
@@ -29,6 +30,7 @@ interface IProceduresProps {
 interface IProcedureModalProps {
   procedures: IProcedure[];
   showModal: boolean;
+  disable: boolean;
   addProcedure: () => void;
   saveProcedure: () => void;
   deleteProcedure: (id: string) => void;
