@@ -42,6 +42,7 @@ const modal = (props: IProcedureModalProps) => {
             </button>
             <button
               className="modal__guardar"
+              disabled={props.disable}
               onClick={() => props.saveProcedure()}
             >
               <i className="bx bx-check"></i>
@@ -53,15 +54,6 @@ const modal = (props: IProcedureModalProps) => {
       <span className="modal__cerrar" onClick={() => props.closeModal()}>
         x
       </span>
-      <div className="modal__eliminar">
-        <div className="modal__eliminar__content">
-          <h3>¿Estas seguro de eliminar este procedimiento?</h3>
-          <div className="modal__eliminar__buttons">
-            <button className="modal__eliminar__cancelar">Cancelar</button>
-            <button className="modal__eliminar__aceptar">aceptar</button>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

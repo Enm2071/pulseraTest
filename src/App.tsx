@@ -14,9 +14,9 @@ import "./App.css";
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
- 
   const [procedures, setProcedures] = useState<IProcedure[]>([]);
   const [showModal, setShowModal] = useState(false);
+  const [disable, setDisable] = useState(false);
 
   useEffect(() => {
     const getProceduresData = async () => {
@@ -38,12 +38,15 @@ function App() {
       code: "Ej. 456123",
       difference: "Ej. 456123",
       procedure: "Ej. 456123",
+      hasChanged: true,
     };
     setProcedures([...procedures, newProcedure]);
+
   };
 
   const deleteProcedureHandler = async (id: string) => {
     try {
+      setDisable(true);
       await deleteProcedure(id);
       const newProcedures = procedures.filter(
         (procedure) => procedure.id !== id
@@ -52,23 +55,43 @@ function App() {
       toast.success("Procedimiento eliminado correctamente");
     } catch (error) {
       toast.error("Error al eliminar el procedimiento");
+    } finally {
+      setDisable(false);
     }
+
   };
 
   const showModalHandler = () => {
-    setShowModal(true);
+    const hasAnyChanged = procedures.some(
+      (procedure) => procedure.hasChanged
+    );
+    if (hasAnyChanged) {
+      toast.warn("Hay cambios sin guardar");
+      return;
+    }
+    setShowModal(!showModal);
   };
 
   const saveProcedureHandler = () => {
     try {
+      setDisable(true);
+      const hasAnyChanged = procedures.some(
+        (procedure) => procedure.hasChanged
+      );
+      if (!hasAnyChanged) {
+        toast.warn("No hay cambios para guardar");
+        return;
+      };
       procedures.forEach(async (procedure) => {
+        if (!procedure.hasChanged) return;
+        delete procedure.hasChanged;
         await createProcedure(procedure);
       });
       toast.success("Procedimientos guardados o actualizados correctamente");
     } catch (error) {
       toast.error("Error al guardar los procedimientos");
     } finally {
-      setShowModal(false);
+      setDisable(false);
     }
   };
 
@@ -83,6 +106,7 @@ function App() {
     );
 
     currentProcedures[index][field] = value;
+    currentProcedures[index].hasChanged = true;
 
     setProcedures(currentProcedures);
   };
@@ -98,12 +122,13 @@ function App() {
         addProcedure={addProcedureHandler}
         procedures={procedures}
         closeModal={() => {
-          setShowModal(false);
+          showModalHandler();
         }}
         saveProcedure={saveProcedureHandler}
         deleteProcedure={deleteProcedureHandler}
         updateProcedure={onChageValueHandler}
         showModal={showModal}
+        disable={disable}
       />
     </div>
   );
